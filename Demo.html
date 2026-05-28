@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic To-Do List - DOM Demo</title>
+    <style>
+        /* Phong cách giao diện sạch sẽ, hiện đại như định hướng trong slide */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .todo-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #333;
+            text-align: center;
+            font-size: 24px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .input-group {
+            display: flex;
+            margin-top: 20px;
+            gap: 10px;
+        }
+
+        /* Định vị các ID tương ứng để mapping với JS */
+        #taskInput {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            outline: none;
+            font-size: 16px;
+        }
+
+        #addBtn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.2s;
+        }
+
+        #addBtn:hover {
+            background-color: #2980b9;
+        }
+
+        #taskList {
+            list-style-type: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+
+        /* Các phần tử được thêm động */
+        .task-item {
+            background-color: #f9f9f9;
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .task-item:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* [Slide 3 & 8] Trạng thái CSS phục vụ tính năng Status Toggle */
+        .task-item.completed {
+            text-decoration: line-through;
+            color: #aaa;
+            background-color: #e8f5e9;
+            border-bottom: 1px solid #c8e6c9;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="todo-container">
+        <h2>Dynamic To-Do List</h2>
+        
+        <div class="input-group">
+            <input type="text" id="taskInput" placeholder="Nhập công việc cần làm...">
+            <button id="addBtn">Thêm</button>
+        </div>
+
+        <ul id="taskList"></ul>
+    </div>
+
+    <script>
+        // ==========================================
+        // STEP 1: SELECTION (Ánh xạ HTML sang JS Variables)
+        // [Slide 5]: Sử dụng getElementById để tối ưu hiệu năng
+        // ==========================================
+        [span_1](start_span)const input = document.getElementById('taskInput');[span_1](end_span)
+        [span_2](start_span)const btn = document.getElementById('addBtn');[span_2](end_span)
+        const taskList = document.getElementById('taskList');
+
+        // ==========================================
+        // STEP 2: INTERACTION (Lắng nghe sự kiện)
+        // [Slide 4, 6]: Sử dụng onclick / addEventListener và kiểm tra dữ liệu đầu vào
+        // ==========================================
+        [span_3](start_span)btn.onclick = function() {[span_3](end_span)
+            const taskText = input.value.trim(); // Lấy giá trị và xóa khoảng trắng thừa
+
+            // [Slide 6]: Validation - Kiểm tra xem input có bị rỗng hay không trước khi thêm
+            [span_4](start_span)if (taskText === "") {[span_4](end_span)
+                alert("Vui lòng nhập nội dung công việc!");
+                return;
+            }
+
+            // Tiến hành xử lý thêm phần tử mới
+            createAndInjectTask(taskText);
+
+            // Xóa sạch nội dung ô input và focus lại sau khi thêm thành công
+            input.value = "";
+            input.focus();
+        };
+
+        // Hỗ trợ thêm sự kiện nhấn nút Enter để trải nghiệm người dùng mượt mà hơn
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                btn.click(); // Kích hoạt sự kiện click của nút Add
+            }
+        });
+
+        // ==========================================
+        // STEP 3 & 4: CREATION & TREE INJECTION (Tạo & Chèn phần tử trong bộ nhớ)
+        // [Slide 7, 8]: Cập nhật in-memory, 0 page reloads
+        // ==========================================
+        function createAndInjectTask(text) {
+            // 1. [Slide 8]: Khởi tạo một phần tử 'li' mới hoàn toàn trong bộ nhớ RAM (In-Memory)
+            [span_5](start_span)[span_6](start_span)const li = document.createElement('li');[span_5](end_span)[span_6](end_span)
+            li.className = 'task-item'; // Gán class để nhận CSS style
+            li.textContent = text;      // Đưa nội dung text của user vào thẻ li
+
+            // 2. [Slide 3, 8]: Đăng ký hành động Status Toggle cho phần tử vừa tạo
+            // Sử dụng classList.toggle() giúp chuyển đổi qua lại giữa trạng thái Active và Completed tức thì
+            [span_7](start_span)[span_8](start_span)li.onclick = function() {[span_7](end_span)[span_8](end_span)
+                [span_9](start_span)li.classList.toggle('completed');[span_9](end_span)
+            };
+
+            // 3. [Slide 4, 8]: Sử dụng appendChild() để liên kết nút con này vào cây DOM hiển thị (ul)
+            [span_10](start_span)[span_11](start_span)taskList.appendChild(li);[span_10](end_span)[span_11](end_span)
+        }
+    </script>
+
+</body>
+</html>
